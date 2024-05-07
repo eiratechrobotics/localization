@@ -10,7 +10,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
   package_name = "localization"
   # Set the path to different files and folders.
-  robot_localization_file_path = PathJoinSubstitution([FindPackageShare(package_name), 'config/ekf.yaml']) 
+  robot_localization_file_path = PathJoinSubstitution([FindPackageShare(package_name), 'config/ekf_gazebo.yaml']) 
   
   camera_to_pose = Node(
     package=package_name,
@@ -30,5 +30,5 @@ def generate_launch_description():
 
   # Add any actions
   ld.add_action(start_robot_localization_cmd)
-  # ld.add_action(camera_to_pose)
+  ld.add_action(camera_to_pose)
   return ld

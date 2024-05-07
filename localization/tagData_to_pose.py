@@ -9,15 +9,21 @@ import math
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
+from ament_index_python import get_package_share_path
+import os
 
 class camera_convertor(Node):
     def __init__(self):
         super().__init__('camera_convertor')
+        # subscibe to Tagdata from sim
         self.subscriber=self.create_subscription(TagData,'sim',self.Tag_cb,10)
+        # publish pose with covariance to EKF
         self.pub= self.create_publisher(PoseWithCovarianceStamped, 'EKF_in_cam', 10)
-
         self.qr_array=PoseArray()
-        tree = ET.parse("/home/brianwaters/workspaces/eirabot_ws/src/demo_area_mapping/demo_area_mapping/sample.xml")
+        # make vertex dictionary of tag locations based on sample.xml
+        path_to_dir=get_package_share_path("demo_area_mapping")
+        path=os.path.join(path_to_dir,"sample.xml")
+        tree = ET.parse(path)
         root = tree.getroot()
         self.VertexDictionary ={}
         for Vertex in root[4]:
@@ -28,12 +34,14 @@ class camera_convertor(Node):
                 "Z":float(Vertex[4][2].text)/1000,
             }
             self.VertexDictionary[Vertex.attrib["Name"]]=Position
-        print(self.VertexDictionary['612'])
+
     def Tag_cb(self,msg):
-        #print(msg)
+        # check if tag is present
         if(msg.tag_present==False):
             return
+        # Get position from tag
         Tag_pose=self.VertexDictionary[str(msg.id)]
+        # use position information from vertex dictionary to get pose
         pose_msg = PoseWithCovarianceStamped()
         pose_msg.header.stamp = self.get_clock().now().to_msg()
         pose_msg.header.frame_id = 'odom'
