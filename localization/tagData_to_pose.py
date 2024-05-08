@@ -18,7 +18,7 @@ class camera_convertor(Node):
         # subscibe to Tagdata from sim
         self.subscriber=self.create_subscription(TagData,'sim',self.Tag_cb,10)
         # publish pose with covariance to EKF
-        self.pub= self.create_publisher(PoseWithCovarianceStamped, 'EKF_in_cam', 10)
+        self.pub= self.create_publisher(PoseWithCovarianceStamped, 'Tag_pose', 10)
         self.qr_array=PoseArray()
         # make vertex dictionary of tag locations based on sample.xml
         path_to_dir=get_package_share_path("demo_area_mapping")
